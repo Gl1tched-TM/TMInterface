@@ -5,6 +5,7 @@
 Interpolation Simulator simulates what game interpolation looks like without the car moving.
 
 How to use:
+
 Press start to restart the race, the plugin will automatically save states until you finish or press playback.
 
 Press playback to playback all the states saved.
