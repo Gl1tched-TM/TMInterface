@@ -21,4 +21,5 @@ Input a time for how often you want states to be saved.
 Live Speed Comparing displays the speed difference between current speed and replay speed.
 
 Validate any replay to show the speed comparison!
+
 ![image](https://github.com/user-attachments/assets/bc29a397-fd84-4e5e-b441-0cbc497fa677)
