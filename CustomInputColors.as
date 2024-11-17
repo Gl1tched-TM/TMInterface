@@ -16,7 +16,7 @@ bool loop = true;
 void OnRunStep(SimulationManager@ simManager)
 {
     currentSteer = simManager.GetInputState().Steer;
-    if (currentMode == colorMode[0]) {
+    if (currentMode == colorMode[0] and CustomColors) {
         bool rainbow = false;
         if (currentSteer >= 0) {
             ExecuteCommand("steer_color " + Math::Abs(Right.x) + "," + Math::Abs(Right.y) + "," + Math::Abs(Right.z));
