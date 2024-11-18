@@ -158,7 +158,7 @@ PluginInfo@ GetPluginInfo()
     auto info = PluginInfo();
     info.Name = "Custom Input Colors";
     info.Author = "Gl1tch3D";
-    info.Version = "v1.0.2";
+    info.Version = "v1.1.0";
     info.Description = "Adds Multi-Color to the Input Display.";
     return info;
 }
