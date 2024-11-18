@@ -133,8 +133,6 @@ void Window()
             left = value1;
             right = value2;
         }
-        UI::Text("Left Steer color " + Math::Abs(left.x) + "," + Math::Abs(left.y) + "," + Math::Abs(left.z));
-        UI::Text("Right Steer color " + Math::Abs(right.x) + "," + Math::Abs(right.y) + "," + Math::Abs(right.z));
         
     } else if (currentMode == colorMode[1]) {
         rainbow = true;
