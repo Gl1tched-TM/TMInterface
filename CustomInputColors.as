@@ -108,7 +108,7 @@ void Window()
     customColors = UI::Checkbox("Active", customColors);
     if (!customColors)
         return;
-
+    UI::PushItemWidth(200);
     if (UI::BeginCombo("Color Mode", currentMode))
     {
         for (uint i = 0; i < colorMode.Length; i++)
