@@ -12,14 +12,23 @@ bool isSet = false;
 bool loop = true;
 CommandList colorChanger;
 
+SimulationManager@ simManager = GetSimulationManager();
+
 void OnRunStep(SimulationManager@ simManager)
 {
+}
+
+void changesteercolor() {
     int currentSteer = simManager.GetInputState().Steer;
+    bool kbright = simManager.GetInputState().Right;
+    bool kbleft = simManager.GetInputState().Left;
     if (currentMode == colorMode[0] and customColors) {
         bool rainbow = false;
-        if (currentSteer >= 0) {
+        if (currentSteer > 0 or kbright and !kbleft) {
+            log("steering right");
             colorChanger.Content = "steer_color " + Math::Abs(right.x) + "," + Math::Abs(right.y) + "," + Math::Abs(right.z);
-        } else {
+        } else if (currentSteer < 0 or kbleft and !kbright){
+            log("steering left");
             colorChanger.Content = "steer_color " + Math::Abs(left.x) + "," + Math::Abs(left.y) + "," + Math::Abs(left.z);
         }
     } else if (currentMode == colorMode[1]) {
@@ -30,6 +39,7 @@ void OnRunStep(SimulationManager@ simManager)
 
     colorChanger.Process();
 }
+
 
 void update()
 {
@@ -84,10 +94,10 @@ void loopcolors()
     right.z = Math::Clamp(right.z, 0.f, 255.f);
 }
 
-void Render()
+void Render(SimulationManager@ simManager)
 {
     update();
-
+    changesteercolor();
     if (rainbow and customColors) {
         loopcolors();
     }
@@ -107,10 +117,12 @@ void Window()
             if (UI::Selectable(color, color == currentMode)) {
                 currentMode = color;
             }
+            
         }
 
         UI::EndCombo();
     }
+
 
     if (currentMode == colorMode[0]) { // Dual Colors
         isSet = false;
@@ -121,6 +133,9 @@ void Window()
             left = value1;
             right = value2;
         }
+        UI::Text("Left Steer color " + Math::Abs(left.x) + "," + Math::Abs(left.y) + "," + Math::Abs(left.z));
+        UI::Text("Right Steer color " + Math::Abs(right.x) + "," + Math::Abs(right.y) + "," + Math::Abs(right.z));
+        
     } else if (currentMode == colorMode[1]) {
         rainbow = true;
         if (rainbow and !isSet) {
@@ -143,7 +158,7 @@ PluginInfo@ GetPluginInfo()
     auto info = PluginInfo();
     info.Name = "Custom Input Colors";
     info.Author = "Gl1tch3D";
-    info.Version = "v1.0.1";
+    info.Version = "v1.0.2";
     info.Description = "Adds Multi-Color to the Input Display.";
     return info;
 }
