@@ -1,8 +1,9 @@
-// Documentation available at https://donadigo.com/tminterface/plugins/api
 int min_time;
 int max_time;
 int timeNotFreeWheeled;
+int time;
 
+bool freeWheeling;
 void RenderEvalSettings()
 {
     min_time = UI::InputTime("Min Time",min_time);
@@ -13,15 +14,18 @@ int bestTime = -1;
 
 BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluationInfo&in info)
 {
-
     int raceTime = simManager.RaceTime;
-    bool freeWheel = simManager.get_SceneVehicleCar().IsFreeWheeling;
     SimulationState@ stateRewind;
+
+    freeWheeling = simManager.get_SceneVehicleCar().IsFreeWheeling;
 
     auto resp = BFEvaluationResponse();
     if (info.Phase == BFPhase::Initial) {
-        if (simManager.PlayerInfo.RaceFinished or raceTime >= max_time) {
-            print("Base: " + Time::Format(timeNotFreeWheeled));
+        if (raceTime >= min_time and !freeWheeling) {
+            timeNotFreeWheeled += 10;
+        }
+        if (raceTime >= max_time) {
+            print("Base: " + Time::Format(timeNotFreeWheeled) + "s (Time: " + Time::Format(time) +")");
             bestTime = timeNotFreeWheeled;
             resp.Decision = BFEvaluationDecision::Accept;
             timeNotFreeWheeled = 0;
@@ -29,7 +33,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
     } else if (raceTime >= max_time) {
         if (timeNotFreeWheeled > bestTime) {
             resp.Decision = BFEvaluationDecision::Accept;
-            print("New time: " + Time::Format(timeNotFreeWheeled), Severity::Success);
+            print("New time: " + Time::Format(timeNotFreeWheeled) + "s (Time: " + Time::Format(time) +")", Severity::Success);
             resp.ResultFileStartContent = "# Found more non-free-wheel time: " + Time::Format(timeNotFreeWheeled);
             bestTime = timeNotFreeWheeled;
             timeNotFreeWheeled = 0;
@@ -38,25 +42,29 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
             timeNotFreeWheeled = 0;
         }
     }
-
-    if (info.Phase == BFPhase::Initial and raceTime >= min_time and !freeWheel) {
-        timeNotFreeWheeled += 10;
-        //print("Initial: " + timeNotFreeWheeled);
-    }
     
-    if (info.Phase == BFPhase::Search and raceTime >= min_time and !freeWheel) {
+    if (info.Phase == BFPhase::Search and raceTime >= min_time and !freeWheeling) {
         timeNotFreeWheeled += 10;
         //print("Search: " + timeNotFreeWheeled + " (Base: " + bestTime + ")");
-    } else if (info.Phase == BFPhase::Search and raceTime >= max_time) {
-        resp.Decision = BFEvaluationDecision::Reject;
-        //print("didn't improve");
-        timeNotFreeWheeled = 0;
     }
+
+    if (!freeWheeling and raceTime >= min_time) {
+        time = simManager.RaceTime;
+    }
+    
     return resp;
 }
 
+
+
 void Main()
 {
+    RegisterVariable("freewheel_min_time",0);
+    RegisterVariable("freewheel_max_time",0);
+    min_time = uint(Math::Max(0,int(GetVariableDouble("freewheel_min_time"))));
+    max_time = uint(Math::Max(0,int(GetVariableDouble("freewheel_max_time"))));
+    SetVariable("freewheel_min_time",min_time);
+    SetVariable("freewheel_max_time",max_time);
     RegisterBruteforceEvaluation("freewheel", "Free Wheel Time", OnEvaluate, RenderEvalSettings);
     log("Plugin started.");
 }
