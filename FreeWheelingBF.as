@@ -6,7 +6,8 @@ int time;
 bool freeWheeling;
 void RenderEvalSettings()
 {
-    min_time = UI::InputTime("Min Time",min_time);
+    UI::Text("Set minimum time a little bit before freewheeling gets activated.");
+    min_time = UI::InputTime("Min Time ()",min_time);
     max_time = UI::InputTime("Max Time",max_time);
 }
 
@@ -25,7 +26,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
             timeNotFreeWheeled += 10;
         }
         if (raceTime >= max_time) {
-            print("Base: " + Time::Format(timeNotFreeWheeled) + "s (Time: " + Time::Format(time) +")");
+            print("Base time no freewheel: " + Time::Format(timeNotFreeWheeled) + "s (RaceTime: " + Time::Format(time) +")");
             bestTime = timeNotFreeWheeled;
             resp.Decision = BFEvaluationDecision::Accept;
             timeNotFreeWheeled = 0;
@@ -33,7 +34,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
     } else if (raceTime >= max_time) {
         if (timeNotFreeWheeled > bestTime) {
             resp.Decision = BFEvaluationDecision::Accept;
-            print("New time: " + Time::Format(timeNotFreeWheeled) + "s (Time: " + Time::Format(time) +")", Severity::Success);
+            print("Found more time not free-wheeled: " + Time::Format(timeNotFreeWheeled) + "s (RaceTime: " + Time::Format(time) +")", Severity::Success);
             resp.ResultFileStartContent = "# Found more non-free-wheel time: " + Time::Format(timeNotFreeWheeled);
             bestTime = timeNotFreeWheeled;
             timeNotFreeWheeled = 0;
