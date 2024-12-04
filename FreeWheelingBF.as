@@ -49,6 +49,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
     if (info.Phase == BFPhase::Initial) {
         //set currpos
         if (raceTime >= min_time and !freeWheeling) {
+            time = raceTime;
             if (currDirection == direction[0] or currDirection == direction[2]) {
                 currPos = posX;
             } else if (currDirection == direction[1] or currDirection == direction[3]) {
@@ -60,62 +61,62 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
             if (freeWheeling) {
                 if (currDirection == direction[0]) {
                     best = currPos;
-                    print("Base X not freewheeled: " + best + " (+X)");
+                    print("Base X not freewheeled: " + best + " (+X) (RaceTime: " + Time::Format(time) + ")");
                     resp.Decision = BFEvaluationDecision::Accept;
                     return resp;
                 } else if (currDirection == direction[1]) {
                     best = currPos;
-                    print("Base X not freewheeled: " + best + " (+Z)");
+                    print("Base X not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(time) + ")");
                     resp.Decision = BFEvaluationDecision::Accept;
                     return resp;
                 } else if (currDirection == direction[2]) {
                     best = currPos;
-                    print("Base Z not freewheeled: " + best + " (-X)");
+                    print("Base Z not freewheeled: " + best + " (-X) (RaceTime: " + Time::Format(time) + ")");
                     resp.Decision = BFEvaluationDecision::Accept;
                     return resp;
                 } else if (currDirection == direction[3]) {
                     best = currPos;
-                    print("Base Z not freewheeled: " + best + " (-Z)");
+                    print("Base Z not freewheeled: " + best + " (-Z) (RaceTime: " + Time::Format(time) + ")");
                     resp.Decision = BFEvaluationDecision::Accept;
                     return resp;
                 }
             }
         }
+
+
     } else if (raceTime >= min_time and freeWheeling) {
-        if (isBetter(simManager)) { 
-            if (minSpeed > 0 and velocity > minSpeed) {
-                resp.Decision = BFEvaluationDecision::Accept;
-                print("Min speed kept");
-            } else {
-                resp.Decision = BFEvaluationDecision::Accept;
-                resp.ResultFileStartContent = "# Best Position no freewheel: " + best;
-                print("No Min speed");
-                return resp;
+        if (isBetter(simManager)) {
+            if (minSpeed > 0) {
+                if (velocity >= minSpeed) {
+                    resp.Decision = BFEvaluationDecision::Accept;
+                    return resp;
+                } else {
+                    resp.Decision = BFEvaluationDecision::Reject;
+                }
             }
+            resp.Decision = BFEvaluationDecision::Accept;
+            return resp;
         } else {
             resp.Decision = BFEvaluationDecision::Reject;
-            return resp;
         }
+
+        return resp;
+
     } else if (raceTime >= max_time and !freeWheeling) {
         if (minSpeed > 0) {
             if (velocity >= minSpeed) {
                 resp.Decision = BFEvaluationDecision::Accept;
-                print("Skipped Freewheel! (Min Speed)", Severity::Success);
-                resp.ResultFileStartContent = "# Freewheel Skipped";
-                simManager.SetSimulationTimeLimit(0.0);
                 return resp;
             } else {
                 resp.Decision = BFEvaluationDecision::Reject;
                 return resp;
             }
-        } else {
-            resp.Decision = BFEvaluationDecision::Accept;
-            print("Skipped Freewheel!", Severity::Success);
-            resp.ResultFileStartContent = "# Freewheel Skipped";
-            simManager.SetSimulationTimeLimit(0.0);
-            return resp;
         }
-        
+        resp.Decision = BFEvaluationDecision::Accept;
+        print("Skipped freewheel!",Severity::Success);
+        resp.ResultFileStartContent = "# Freewheel Skipped";
+        simManager.SetSimulationTimeLimit(0.0);
+        return resp;
     }
 
     if (info.Phase == BFPhase::Search and raceTime >= min_time and !freeWheeling) {
@@ -138,32 +139,36 @@ void OnSimulationBegin(SimulationManager@ simManager)
 
 bool isBetter(SimulationManager@ simManager)
 {
-
+    
     if (currDirection == direction[0]) {
         if (currPos > best) {
             best = currPos;
-            print("Best Position not freewheeled: " + best, Severity::Success);
-            
+            print("Best Position not freewheeled: " + best + " (RaceTime: " + Time::Format(time) + ")", Severity::Success);
+            return true;
         }
     } else if (currDirection == direction[1]) {
         if (currPos < best) {
             best = currPos;
-            print("Best Position not freewheeled: " + best, Severity::Success);
+            print("Best Position not freewheeled: " + best + " (RaceTime: " + Time::Format(time) + ")", Severity::Success);
+            return true;
         }
     } else if (currDirection == direction[2]) {
         if (currPos > best) {
             best = currPos;
-            print("Best Position not freewheeled: " + best, Severity::Success);
+            print("Best Position not freewheeled: " + best + " (RaceTime: " + Time::Format(time) + ")", Severity::Success);
+            return true;
         }
     } else if (currDirection == direction[3]) {
         if (currPos < best) {
             best = currPos;
-            print("Best Position not freewheeled: " + best, Severity::Success);
+            print("Best Position not freewheeled: " + best + " (RaceTime: " + Time::Format(time) + ")", Severity::Success);
+            return true;
         }
     }
 
     return false;
 }
+
 
 void Main()
 {
@@ -189,7 +194,7 @@ PluginInfo@ GetPluginInfo()
     auto info = PluginInfo();
     info.Name = "Free-wheel BF";
     info.Author = "Gl1tch3D";
-    info.Version = "v2.0.0";
+    info.Version = "v2.0.1";
     info.Description = "Searches for the least amount of freewheel time.";
     return info;
 }
