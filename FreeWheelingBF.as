@@ -14,7 +14,7 @@ void RenderEvalSettings()
     UI::Dummy(vec2(0,10));
     min_time = UI::InputTimeVar("Min Time","freewheel_min_time");
     max_time = UI::InputTimeVar("Max Time","freewheel_max_time");
-    UI::Text("Set Max time after freewheel block to stop bruteforce.");
+    UI::TextDimmed("Set Max time after freewheel block to stop bruteforce.");
 
 
     UI::Dummy(vec2(0,10));
