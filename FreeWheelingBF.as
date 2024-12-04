@@ -17,7 +17,7 @@ void RenderEvalSettings()
     UI::TextDimmed("Set Max time after freewheel block to stop bruteforce.");
 
 
-    UI::Dummy(vec2(0,10));
+    UI::Dummy(vec2(0,15));
     if (UI::BeginCombo("Direction", currDirection))
     {
         for (uint i = 0; i < direction.Length; i++)
@@ -101,6 +101,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
             if (velocity >= minSpeed) {
                 resp.Decision = BFEvaluationDecision::Accept;
                 print("Skipped Freewheel! (Min Speed)", Severity::Success);
+                resp.ResultFileStartContent = "# Freewheel Skipped";
                 simManager.SetSimulationTimeLimit(0.0);
                 return resp;
             } else {
@@ -110,6 +111,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
         } else {
             resp.Decision = BFEvaluationDecision::Accept;
             print("Skipped Freewheel!", Severity::Success);
+            resp.ResultFileStartContent = "# Freewheel Skipped";
             simManager.SetSimulationTimeLimit(0.0);
             return resp;
         }
