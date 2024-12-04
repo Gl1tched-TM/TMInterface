@@ -185,7 +185,7 @@ PluginInfo@ GetPluginInfo()
     auto info = PluginInfo();
     info.Name = "Free-wheel BF";
     info.Author = "Gl1tch3D";
-    info.Version = "v2.0.0";
+    info.Version = "v2.0.2";
     info.Description = "Searches for the least amount of freewheel time.";
     return info;
 }
