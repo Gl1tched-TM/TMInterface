@@ -63,9 +63,9 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
                 if (currDirection == direction[0]) {
                     print("Base X not freewheeled: " + best + " (+X) (RaceTime: " + Time::Format(time) + ")");
                 } else if (currDirection == direction[1]) {
-                    print("Base X not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(time) + ")");
+                    print("Base Z not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(time) + ")");
                 } else if (currDirection == direction[2]) {
-                    print("Base Z not freewheeled: " + best + " (-X) (RaceTime: " + Time::Format(time) + ")");
+                    print("Base X not freewheeled: " + best + " (-X) (RaceTime: " + Time::Format(time) + ")");
                 } else if (currDirection == direction[3]) {
                     print("Base Z not freewheeled: " + best + " (-Z) (RaceTime: " + Time::Format(time) + ")");
                 }
