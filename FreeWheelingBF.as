@@ -59,27 +59,18 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
         //track currpos
         if (raceTime >= min_time) {
             if (freeWheeling) {
+                best = currPos;
                 if (currDirection == direction[0]) {
-                    best = currPos;
                     print("Base X not freewheeled: " + best + " (+X) (RaceTime: " + Time::Format(time) + ")");
-                    resp.Decision = BFEvaluationDecision::Accept;
-                    return resp;
                 } else if (currDirection == direction[1]) {
-                    best = currPos;
                     print("Base X not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(time) + ")");
-                    resp.Decision = BFEvaluationDecision::Accept;
-                    return resp;
                 } else if (currDirection == direction[2]) {
-                    best = currPos;
                     print("Base Z not freewheeled: " + best + " (-X) (RaceTime: " + Time::Format(time) + ")");
-                    resp.Decision = BFEvaluationDecision::Accept;
-                    return resp;
                 } else if (currDirection == direction[3]) {
-                    best = currPos;
                     print("Base Z not freewheeled: " + best + " (-Z) (RaceTime: " + Time::Format(time) + ")");
-                    resp.Decision = BFEvaluationDecision::Accept;
-                    return resp;
                 }
+                resp.Decision = BFEvaluationDecision::Accept;
+                return resp;
             }
         }
 
@@ -194,7 +185,7 @@ PluginInfo@ GetPluginInfo()
     auto info = PluginInfo();
     info.Name = "Free-wheel BF";
     info.Author = "Gl1tch3D";
-    info.Version = "v2.0.1";
+    info.Version = "v2.0.0";
     info.Description = "Searches for the least amount of freewheel time.";
     return info;
 }
