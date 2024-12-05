@@ -62,6 +62,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
     auto resp = BFEvaluationResponse();
     if (info.Phase == BFPhase::Initial) {
         //set currpos
+        print("initial");
         if (!GetVariableBool("freewheel_optimizetime")) {
             if (raceTime >= min_time and !freeWheeling) {
                 time = raceTime;
@@ -82,6 +83,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
         //track currpos
 
         if (!GetVariableBool("freewheel_optimizetime") and raceTime >= min_time and freeWheeling) {
+            print("test");
             if (optimizeSpeed) {
                 bestSpeed = velocity;
                 best = currPos;
@@ -94,14 +96,17 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
                 resp.Decision = BFEvaluationDecision::Accept;
                 return resp;
             }
-        } else {
+        } else if (GetVariableBool("freewheel_optimizetime") and raceTime >= min_time and freeWheeling) {
             if (optimizeSpeed) {
-                if (raceTime >= min_time and freeWheeling) {
-                    bestTime = time;
-                    print("Base time not freewheeled: " + Time::Format(time) + "s");
-                    resp.Decision = BFEvaluationDecision::Accept;
-                    return resp;
-                }
+                bestTime = time;
+                print("Base time not freewheeled: " + Time::Format(time) + "s" + " | Best Speed: " + bestSpeed);
+                resp.Decision = BFEvaluationDecision::Accept;
+                return resp;
+            } else {
+                bestTime = time;
+                print("Base time not freewheeled: " + Time::Format(time) + "s");
+                resp.Decision = BFEvaluationDecision::Accept;
+                return resp;
             }
         }
 
@@ -364,7 +369,7 @@ PluginInfo@ GetPluginInfo()
     auto info = PluginInfo();
     info.Name = "Free-wheel BF";
     info.Author = "Gl1tch3D";
-    info.Version = "v2.1.0";
+    info.Version = "v2.1.1";
     info.Description = "Searches for the least amount of freewheel time.";
     return info;
 }
