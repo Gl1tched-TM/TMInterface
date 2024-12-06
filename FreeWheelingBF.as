@@ -62,7 +62,6 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
     auto resp = BFEvaluationResponse();
     if (info.Phase == BFPhase::Initial) {
         //set currpos
-        print("initial");
         if (!GetVariableBool("freewheel_optimizetime")) {
             if (raceTime >= min_time and !freeWheeling) {
                 time = raceTime;
@@ -76,6 +75,9 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
         } else {
             if (raceTime >= min_time and !freeWheeling) {
                 time = raceTime;
+                if (optimizeSpeed) {
+                    bestSpeed = velocity;
+                }
             }
         }
         
@@ -83,7 +85,6 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
         //track currpos
 
         if (!GetVariableBool("freewheel_optimizetime") and raceTime >= min_time and freeWheeling) {
-            print("test");
             if (optimizeSpeed) {
                 bestSpeed = velocity;
                 best = currPos;
@@ -143,16 +144,12 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
             // check if velocity is over bestSpeed
             if (isBetter(simManager)) {
                 if (GetVariableBool("freewheel_optimizetime")) {
-                    printBase();
                     resp.Decision = BFEvaluationDecision::Accept;
                     resp.ResultFileStartContent = "# Best Time not freewheeled: " + Time::Format(time);
-                    print("More Speed!");
                     return resp;
                 } else {
-                    printBase();
                     resp.Decision = BFEvaluationDecision::Accept;
                     resp.ResultFileStartContent = "# Best Position not freewheeled: " + best;
-                    print("More Speed!");
                     return resp;
                 }
             } else {
@@ -327,6 +324,11 @@ bool isBetter(SimulationManager@ simManager)
                 } else {
                     return false;
                 }
+            } else if (optimizeSpeed and velocity >= bestSpeed) {
+                print("Found more time not freewheeled: " + Time::Format(time) + "s" + " | Best Speed: " + bestSpeed, Severity::Success);
+                bestSpeed = velocity;
+                bestTime = time;
+                return true;
             // if min speed is not used, still accept
             } else {
                 print("Found more time not freewheeled: " + Time::Format(time) + "s", Severity::Success);
@@ -369,7 +371,7 @@ PluginInfo@ GetPluginInfo()
     auto info = PluginInfo();
     info.Name = "Free-wheel BF";
     info.Author = "Gl1tch3D";
-    info.Version = "v2.1.1";
+    info.Version = "v2.1.2";
     info.Description = "Searches for the least amount of freewheel time.";
     return info;
 }
