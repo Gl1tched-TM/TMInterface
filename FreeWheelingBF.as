@@ -187,12 +187,19 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
                 return resp;
             }
         }
-        //if freewheel skipped, end process
-        resp.Decision = BFEvaluationDecision::Accept;
-        print("Skipped freewheel!",Severity::Success);
-        resp.ResultFileStartContent = "# Freewheel Skipped";
-        simManager.SetSimulationTimeLimit(0.0);
-        return resp;
+        if (optimizeSpeed) {
+            if (isBetter(simManager)) {
+                resp.ResultFileStartContent = "# Best Position not freewheeled: " +best;
+                resp.Decision = BFEvaluationDecision::Accept;
+                return resp;
+            }
+        } else {
+            resp.Decision = BFEvaluationDecision::Accept;
+            print("Skipped freewheel!",Severity::Success);
+            resp.ResultFileStartContent = "# Freewheel Skipped";
+            simManager.SetSimulationTimeLimit(0.0);
+            return resp;
+        }
     }
 
     if (!GetVariableBool("freewheel_optimizetime")) {
