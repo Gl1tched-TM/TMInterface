@@ -226,16 +226,14 @@ void printBase()
     string message = "Base";
 
     if (GetVariableString("freewheel_currdirection") == direction[0]) {
-        message += " X not freewheeled: " + best + " (+X)";
+        message += " X not freewheeled: " + best + " (+X) (RaceTime: " + Time::Format(time) + ")";
     } else if (GetVariableString("freewheel_currdirection") == direction[1]) {
-        message += " Z not freewheeled: " + best + " (+Z) ";
+        message += " Z not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(time) + ")";
     } else if (GetVariableString("freewheel_currdirection") == direction[2]) {
-        message += " X not freewheeled: " + best + " (-X) ";
+        message += " X not freewheeled: " + best + " (-X) (RaceTime: " + Time::Format(time) + ")";
     } else if (GetVariableString("freewheel_currdirection") == direction[3]) {
-        message += " Z not freewheeled: " + best + " (-Z) ";
+        message += " Z not freewheeled: " + best + " (-Z) (RaceTime: " + Time::Format(time) + ")";
     }
-
-    message += " (RaceTime: " + Time::Format(time) + ")";
 
     if (optimizeSpeed) {
         message += " | Best Speed: " + bestSpeed;
@@ -257,13 +255,13 @@ bool isBetter(SimulationManager@ simManager)
                 if (currPos >= best and velocity > bestSpeed) {
                     best = currPos;
                     bestSpeed = velocity;
-                    print("Found better Position not freewheeled: " + best + " (+X) (RaceTime: " + Time::Format(time) + ")" + " | Best Speed: " + bestSpeed, Severity::Success);
+                    print("Found better Position not freewheeled: " + Text::FormatFloat(best, "", 0, 10) + " (+X) (RaceTime: " + Time::Format(time) + ")" + " | Best Speed: " + bestSpeed, Severity::Success);
                     return true;
                 }
             } else {
                 if (currPos > best) {
                     best = currPos;
-                    print("Found better Position not freewheeled: " + best + " (+X) (RaceTime: " + Time::Format(time) + ")", Severity::Success);
+                    print("Found better Position not freewheeled: " + Text::FormatFloat(best, "", 0, 10) + " (+X) (RaceTime: " + Time::Format(time) + ")", Severity::Success);
                     return true;
                 }
             }
@@ -272,13 +270,13 @@ bool isBetter(SimulationManager@ simManager)
                 if (currPos >= best and velocity > bestSpeed) {
                     best = currPos;
                     bestSpeed = velocity;
-                    print("Found better Position not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(time) + ")" + " | Best Speed: " + bestSpeed, Severity::Success);
+                    print("Found better Position not freewheeled: " + Text::FormatFloat(best, "", 0, 10) + " (+Z) (RaceTime: " + Time::Format(time) + ")" + " | Best Speed: " + bestSpeed, Severity::Success);
                     return true;
                 }
             } else {
                 if (currPos > best) {
                     best = currPos;
-                    print("Found better Position not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(time) + ")", Severity::Success);
+                    print("Found better Position not freewheeled: " + Text::FormatFloat(best, "", 0, 10) + " (+Z) (RaceTime: " + Time::Format(time) + ")", Severity::Success);
                     return true;
                 }
             }
