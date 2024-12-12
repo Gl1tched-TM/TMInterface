@@ -58,7 +58,7 @@ void RenderEvalSettings()
     UI::Dummy(vec2(0,15));
     UI::Text("Wheel Conditions:");
 
-    min_wheels = UI::SliderIntVar("Minimum Wheels (0 to disable)","freewheel_min_wheels", 0, 4);
+    min_wheels = UI::SliderIntVar("Minimum Wheels on ground (0 to disable)","freewheel_min_wheels", 0, 4);
 
     UI::Dummy(vec2(0,10));
 
@@ -170,7 +170,6 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
 
         break;
     default:
-        print("unreachable info.Phase");
         break;
     }
 
@@ -400,14 +399,14 @@ void Main()
     optimizeTime = GetVariableBool("freewheel_optimizetime");
     currDirection = GetVariableString("freewheel_currdirection");
 
-    RegisterBruteforceEvaluation("freewheel", "Free Wheeling2", OnEvaluate, RenderEvalSettings);
+    RegisterBruteforceEvaluation("freewheel", "Free Wheeling", OnEvaluate, RenderEvalSettings);
     log("Plugin started.");
 }
 
 PluginInfo@ GetPluginInfo()
 {
     auto info = PluginInfo();
-    info.Name = "Free-wheel BF (Cleaned code)";
+    info.Name = "Free-wheel BF";
     info.Author = "Gl1tch3D";
     info.Version = "v2.2.0";
     info.Description = "Searches for the least amount of freewheel time.";
