@@ -3,6 +3,7 @@ int max_time;
 int time;
 int bestTime;
 int min_wheels;
+int posPrecision = 3;
 
 float bestSpeed;
 float best;
@@ -46,6 +47,9 @@ void RenderEvalSettings()
             UI::EndCombo();
         }
         optimizeTime = false;
+        UI::PushItemWidth(120);
+        posPrecision = UI::InputInt("Position Precision", posPrecision, 1);
+        UI::TextDimmed("Show how much decimal precision is displayed.");
     }
 
     optimizeSpeed = UI::CheckboxVar("Optimize Speed?", "freewheel_optimizespeed");
@@ -58,7 +62,7 @@ void RenderEvalSettings()
     UI::Dummy(vec2(0,15));
     UI::Text("Wheel Conditions:");
 
-    min_wheels = UI::SliderIntVar("Minimum Wheels on ground (0 to disable)","freewheel_min_wheels", 0, 4);
+    min_wheels = UI::SliderIntVar("Minimum Wheels (0 to disable)","freewheel_min_wheels", 0, 4);
 
     UI::Dummy(vec2(0,10));
 
@@ -95,8 +99,9 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
 
         if (freeWheeling) {
             if (optimizeTime) {
-                bestTime = time;
                 if (info.Iterations == 0) {
+                    time -= 10;
+                    bestTime = time;
                     printBase();
                 }
             } else {
@@ -105,6 +110,8 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
                 }
                 best = currPos;
                 if (info.Iterations == 0) {
+                    time -= 10;
+                    bestTime = time;
                     printBase();
                 }
             }
@@ -132,6 +139,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
         }
 
         if (freeWheeling) {
+            time -= 10;
             if (isBetter(simManager)) {
                 resp.Decision = BFEvaluationDecision::Accept;
             } else {
@@ -161,6 +169,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
             time = raceTime;
         } else {
             //tracking position during search
+            time = raceTime;
             if (currDirection == direction[0] or currDirection == direction[2]) {
                 currPos = posX;
             } else if (currDirection == direction[1] or currDirection == direction[3]) {
@@ -170,6 +179,7 @@ BFEvaluationResponse@ OnEvaluate(SimulationManager@ simManager, const BFEvaluati
 
         break;
     default:
+        print("unreachable info.Phase");
         break;
     }
 
@@ -182,17 +192,17 @@ void printBase()
     string message;
 
     if (optimizeTime) {
-        message = "Base time not freewheeled: " + Time::Format(time) + "s";
+        message = "Base time not freewheeled: " + Time::Format(bestTime) + "s";
     } else {
         message = "Base";
         if (currDirection == direction[0]) {
-            message += " X not freewheeled: " + best + " (+X) (RaceTime: " + Time::Format(time) + ")";
+            message += " X not freewheeled: " + best + " (+X) (RaceTime: " + Time::Format(bestTime) + ")";
         } else if (currDirection == direction[1]) {
-            message += " Z not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(time) + ")";
+            message += " Z not freewheeled: " + best + " (+Z) (RaceTime: " + Time::Format(bestTime) + ")";
         } else if (currDirection == direction[2]) {
-            message += " X not freewheeled: " + best + " (-X) (RaceTime: " + Time::Format(time) + ")";
+            message += " X not freewheeled: " + best + " (-X) (RaceTime: " + Time::Format(bestTime) + ")";
         } else if (currDirection == direction[3]) {
-            message += " Z not freewheeled: " + best + " (-Z) (RaceTime: " + Time::Format(time) + ")";
+            message += " Z not freewheeled: " + best + " (-Z) (RaceTime: " + Time::Format(bestTime) + ")";
         }
     }
     
@@ -243,13 +253,14 @@ bool isBetter(SimulationManager@ simManager)
     //accept time improvements
     if (optimizeTime) {
         if (time > bestTime) {
+            bestTime = time;
             if (minSpeed > 0) {
                 if (velocity >= minSpeed) {
                     print(MakeImprovementMessage(simManager), Severity::Success);
                     better = true;
                 }
             } else if (optimizeSpeed and velocity >= bestSpeed) {
-               print(MakeImprovementMessage(simManager), Severity::Success);
+                print(MakeImprovementMessage(simManager), Severity::Success);
                 bestSpeed = velocity;
                 better = true;
             // if min speed is not used, still accept
@@ -334,9 +345,9 @@ string MakeImprovementMessage(SimulationManager@ simManager) {
     string improvementmessage;
 
     if (optimizeTime) {
-        improvementmessage = "Found more time not freewheeled: " + bestTime;
+        improvementmessage = "Found more time not freewheeled: " + Time::Format(bestTime) + "s";
     } else {
-        improvementmessage = "Found better Position not freewheeled: " + Text::FormatFloat(best, "", 0, 10);
+        improvementmessage = "Found better Position not freewheeled: " + Text::FormatFloat(best, "", 0, posPrecision);
 
         if (currDirection == direction[0]) {
             improvementmessage += " (+X) ";
@@ -408,7 +419,7 @@ PluginInfo@ GetPluginInfo()
     auto info = PluginInfo();
     info.Name = "Free-wheel BF";
     info.Author = "Gl1tch3D";
-    info.Version = "v2.2.0";
+    info.Version = "v2.2.1";
     info.Description = "Searches for the least amount of freewheel time.";
     return info;
 }
