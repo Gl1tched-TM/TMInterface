@@ -1,6 +1,4 @@
 // Documentation available at https://donadigo.com/tminterface/plugins/api
-string error;
-SimulationStateFile startStateFile;
 array<SimulationState@> states;
 
 int nextframe;
