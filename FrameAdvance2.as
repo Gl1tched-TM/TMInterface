@@ -22,7 +22,6 @@ void OnRunStep(SimulationManager@ simManager)
     stateNum += 1;
     states.Resize(stateNum + 1);
     @states[stateNum] = simManager.SaveState();
-    log("saved state," + stateNum + "," + stateNum);
 
 }
 
@@ -39,7 +38,6 @@ void Render()
         if (UI::Button("Backward",vec2(0,25))) {
             if (stateNum > 1) {
                 stateNum -= 2;
-                log(""+stateNum);
                 simManager.RewindToState(states[stateNum], false);
             }
             
